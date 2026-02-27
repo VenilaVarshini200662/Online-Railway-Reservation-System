@@ -155,7 +155,6 @@ let trains = JSON.parse(localStorage.getItem('trains'));
 let users = JSON.parse(localStorage.getItem('users'));
 let bookings = JSON.parse(localStorage.getItem('bookings'));
 let pendingBooking = null;
-let selectedSeatType = null;
 let currentTrainId = null;
 
 // ==================== UTILITY FUNCTIONS ====================
@@ -190,6 +189,24 @@ function showNotification(message, type = 'success') {
   setTimeout(() => notification.remove(), 3000);
 }
 
+// ==================== UPDATE LOGIN BUTTON FUNCTION ====================
+
+function updateLoginButton() {
+  const loginBtn = document.getElementById('loginBtn');
+  
+  if (currentUser) {
+    // User is logged in - change button to logout
+    loginBtn.innerHTML = '<i class="fas fa-sign-out-alt"></i> Logout';
+    loginBtn.classList.add('logout-btn');
+    loginBtn.onclick = logout;
+  } else {
+    // User is logged out - change button to login
+    loginBtn.innerHTML = '<i class="fas fa-user-circle"></i> Login';
+    loginBtn.classList.remove('logout-btn');
+    loginBtn.onclick = () => showModal('loginModal');
+  }
+}
+
 // ==================== LOGIN FUNCTION ====================
 
 function handleLogin() {
@@ -212,6 +229,7 @@ function handleLogin() {
       };
       saveToStorage();
       hideModal('loginModal');
+      updateLoginButton(); // Update button after login
       renderAdminDashboard();
       showNotification('Welcome to RailReserve Admin Panel', 'success');
     } else {
@@ -227,6 +245,7 @@ function handleLogin() {
       currentUser = user;
       saveToStorage();
       hideModal('loginModal');
+      updateLoginButton(); // Update button after login
       
       const pendingTrainId = sessionStorage.getItem('pendingTrainId');
       if (pendingTrainId) {
@@ -280,6 +299,7 @@ function handleRegister() {
   saveToStorage();
   
   hideModal('registerModal');
+  updateLoginButton(); // Update button after registration
   
   const pendingTrainId = sessionStorage.getItem('pendingTrainId');
   if (pendingTrainId) {
@@ -290,6 +310,17 @@ function handleRegister() {
   }
   
   showNotification('Registration successful!', 'success');
+}
+
+// ==================== LOGOUT FUNCTION ====================
+
+function logout() {
+  currentUser = null;
+  localStorage.setItem('currentUser', JSON.stringify(null));
+  sessionStorage.removeItem('pendingTrainId');
+  updateLoginButton(); // Update button after logout
+  renderHomePage();
+  showNotification('Logged out successfully', 'success');
 }
 
 // ==================== PAGE RENDERING ====================
@@ -424,7 +455,7 @@ function searchTrains() {
   `).join('');
 }
 
-// ==================== BOOKING FLOW - FIXED VERSION ====================
+// ==================== BOOKING FLOW ====================
 
 function initiateBooking(trainId) {
   if (!currentUser) {
@@ -464,10 +495,10 @@ function createSeatSelectionModal(train) {
         </div>
         <div class="seat-details">
           <p>Available: <span class="available-count">${count}</span></p>
-          <p>Fare: <span class="fare-amount">₹${train.fare[type]}</span></p>
+          <p>Fare per passenger: <span class="fare-amount">₹${train.fare[type]}</span></p>
         </div>
         <div class="seat-select-hint">
-          <i class="fas fa-hand-pointer"></i> Click to select
+          <i class="fas fa-hand-pointer"></i> Click to proceed to payment
         </div>
       </div>
     `).join('');
@@ -481,9 +512,6 @@ function createSeatSelectionModal(train) {
         <p class="train-route-modal">${train.from} → ${train.to}</p>
       </div>
       <div class="modal-body">
-        <div class="seat-options-grid">
-          ${seatOptions}
-        </div>
         <div class="passenger-details-section">
           <h3><i class="fas fa-users"></i> Passenger Details</h3>
           <div class="form-group">
@@ -505,6 +533,11 @@ function createSeatSelectionModal(train) {
               <option value="6">6 Passengers</option>
             </select>
           </div>
+        </div>
+        
+        <h3 style="margin: 2rem 0 1rem; color: var(--primary);">Select Seat Type</h3>
+        <div class="seat-options-grid">
+          ${seatOptions}
         </div>
       </div>
     </div>
@@ -531,58 +564,47 @@ function updateSeatSelectionModal(train) {
         </div>
         <div class="seat-details">
           <p>Available: <span class="available-count">${count}</span></p>
-          <p>Fare: <span class="fare-amount">₹${train.fare[type]}</span></p>
+          <p>Fare per passenger: <span class="fare-amount">₹${train.fare[type]}</span></p>
         </div>
         <div class="seat-select-hint">
-          <i class="fas fa-hand-pointer"></i> Click to select
+          <i class="fas fa-hand-pointer"></i> Click to proceed to payment
         </div>
       </div>
     `).join('');
 }
 
-// NEW FUNCTION: Handle seat selection and directly proceed to payment
+// MAIN FUNCTION: Handle seat selection and directly go to payment
 function handleSeatSelection(seatType, availableSeats) {
+  const passengerName = document.getElementById('passengerName').value.trim();
+  const passengerMobile = document.getElementById('passengerMobile').value.trim();
   const passengerCount = parseInt(document.getElementById('passengerCount').value);
-  const passengerName = document.getElementById('passengerName').value;
-  const passengerMobile = document.getElementById('passengerMobile').value;
   
   // Validate passenger details
-  if (!passengerName || !passengerMobile) {
-    showNotification('Please fill passenger details first', 'error');
+  if (!passengerName) {
+    showNotification('Please enter passenger name', 'error');
+    return;
+  }
+  
+  if (!passengerMobile) {
+    showNotification('Please enter mobile number', 'error');
+    return;
+  }
+  
+  if (passengerMobile.length !== 10 || isNaN(passengerMobile)) {
+    showNotification('Please enter a valid 10-digit mobile number', 'error');
     return;
   }
   
   // Check seat availability
   if (availableSeats < passengerCount) {
-    showNotification(`Only ${availableSeats} seats available. Please reduce passenger count or select another class.`, 'error');
+    showNotification(`Only ${availableSeats} seats available in ${seatType.toUpperCase()}. Please reduce passenger count or select another class.`, 'error');
     return;
   }
   
-  // Confirm selection
-  if (confirm(`Proceed to payment for ${passengerCount} passenger(s) in ${seatType.toUpperCase()} class?`)) {
-    selectedSeatType = seatType;
-    proceedToPayment();
-  }
-}
-
-function proceedToPayment() {
+  // Get train details
   const train = trains.find(t => t.id === currentTrainId);
   
-  if (!train) {
-    showNotification('Train not found', 'error');
-    return;
-  }
-  
-  const passengerName = document.getElementById('passengerName').value;
-  const passengerMobile = document.getElementById('passengerMobile').value;
-  const passengerCount = parseInt(document.getElementById('passengerCount').value);
-  
-  if (!selectedSeatType) {
-    showNotification('Please select a seat type', 'error');
-    return;
-  }
-  
-  // Store pending booking
+  // Store booking details
   pendingBooking = {
     trainId: train.id,
     trainName: train.name,
@@ -593,12 +615,12 @@ function proceedToPayment() {
     passengerName: passengerName,
     passengerMobile: passengerMobile,
     passengerCount: passengerCount,
-    seatType: selectedSeatType,
-    fare: train.fare[selectedSeatType] * passengerCount,
+    seatType: seatType,
+    fare: train.fare[seatType] * passengerCount,
     journeyDate: document.getElementById('searchDate')?.value || new Date().toISOString().split('T')[0]
   };
   
-  // Show payment modal
+  // Hide seat selection modal and show payment modal
   hideModal('seatSelectionModal');
   showPaymentModal();
 }
@@ -654,6 +676,7 @@ function processPayment() {
   setTimeout(() => {
     const train = trains.find(t => t.id === pendingBooking.trainId);
     
+    // Double-check availability before finalizing
     if (train.seats[pendingBooking.seatType] < pendingBooking.passengerCount) {
       const pnr = generatePNR();
       const booking = {
@@ -671,8 +694,9 @@ function processPayment() {
       saveToStorage();
       
       hideModal('paymentModal');
-      showNotification(`Payment successful! You've been waitlisted. PNR: ${pnr}`, 'warning');
+      showNotification(`Payment successful! You've been waitlisted. PNR: ${pnr} (WL ${booking.waitlistNumber})`, 'warning');
     } else {
+      // Confirm booking and reduce seats
       train.seats[pendingBooking.seatType] -= pendingBooking.passengerCount;
       
       const pnr = generatePNR();
@@ -682,7 +706,7 @@ function processPayment() {
         bookingDate: new Date().toISOString(),
         status: 'confirmed',
         coach: pendingBooking.seatType.toUpperCase() + Math.floor(Math.random() * 10),
-        seat: Math.floor(Math.random() * 100) + 1,
+        seatNumbers: Array.from({length: pendingBooking.passengerCount}, (_, i) => Math.floor(Math.random() * 100) + 1).join(', '),
         userId: currentUser.id,
         paymentId: 'PAY' + Math.random().toString(36).substring(2, 10).toUpperCase()
       };
@@ -695,10 +719,11 @@ function processPayment() {
       showNotification(`Payment successful! Booking confirmed. PNR: ${pnr}`, 'success');
     }
     
+    // Clear pending booking
     pendingBooking = null;
-    selectedSeatType = null;
     currentTrainId = null;
     
+    // Update trains in localStorage
     localStorage.setItem('trains', JSON.stringify(trains));
     
   }, 2000);
@@ -769,7 +794,8 @@ function checkPNR() {
           <td><span class="booking-status ${statusClass}">${booking.status.toUpperCase()}</span></td>
         </tr>
         ${booking.waitlistNumber ? `<tr><td><strong>Waitlist No:</strong></td><td>WL ${booking.waitlistNumber}</td></tr>` : ''}
-        ${booking.coach ? `<tr><td><strong>Coach/Seat:</strong></td><td>${booking.coach} / ${booking.seat}</td></tr>` : ''}
+        ${booking.coach ? `<tr><td><strong>Coach:</strong></td><td>${booking.coach}</td></tr>` : ''}
+        ${booking.seatNumbers ? `<tr><td><strong>Seat Numbers:</strong></td><td>${booking.seatNumbers}</td></tr>` : ''}
       </table>
     </div>
   `;
@@ -813,7 +839,7 @@ function renderUserDashboard() {
                 <span class="booking-status ${booking.status === 'confirmed' ? 'status-confirmed' : 'status-waitlist'}">
                   ${booking.status.toUpperCase()}
                 </span>
-                <p class="fare"><i class="fas fa-rupee-sign"></i> ${booking.fare}</p>
+                <p class="fare"><i class="fas fa-rupee-sign"></i> ₹${booking.fare}</p>
                 ${booking.status !== 'cancelled' ? `
                   <button class="btn-secondary" onclick="cancelBooking('${booking.pnr}')">
                     <i class="fas fa-times"></i> Cancel
@@ -829,7 +855,7 @@ function renderUserDashboard() {
 }
 
 function cancelBooking(pnr) {
-  if (confirm('Are you sure you want to cancel this booking?')) {
+  if (confirm('Are you sure you want to cancel this booking? Refund will be processed to your original payment method.')) {
     const bookingIndex = bookings.findIndex(b => b.pnr === pnr);
     if (bookingIndex !== -1) {
       const booking = bookings[bookingIndex];
@@ -844,7 +870,7 @@ function cancelBooking(pnr) {
       booking.status = 'cancelled';
       saveToStorage();
       
-      showNotification('Booking cancelled successfully', 'success');
+      showNotification('Booking cancelled successfully. Refund will be processed within 5-7 working days.', 'success');
       renderUserDashboard();
     }
   }
@@ -1097,7 +1123,7 @@ function confirmWaitlist(pnr) {
     train.seats[booking.seatType] -= booking.passengerCount;
     booking.status = 'confirmed';
     booking.coach = booking.seatType.toUpperCase() + Math.floor(Math.random() * 10);
-    booking.seat = Math.floor(Math.random() * 100) + 1;
+    booking.seatNumbers = Array.from({length: booking.passengerCount}, (_, i) => Math.floor(Math.random() * 100) + 1).join(', ');
     delete booking.waitlistNumber;
     
     saveToStorage();
@@ -1108,37 +1134,18 @@ function confirmWaitlist(pnr) {
   }
 }
 
-function logout() {
-  currentUser = null;
-  localStorage.setItem('currentUser', JSON.stringify(null));
-  sessionStorage.removeItem('pendingTrainId');
-  renderHomePage();
-  showNotification('Logged out successfully', 'success');
-  
-  updateNavForLogout();
-}
-
-function updateNavForLogout() {
-  const navLinks = document.getElementById('navLinks');
-  const existingLogout = document.querySelector('.logout-btn');
-  if (existingLogout) existingLogout.remove();
-  
-  const loginBtn = document.getElementById('loginBtn');
-  if (loginBtn) loginBtn.style.display = 'flex';
-}
-
 // ==================== EVENT LISTENERS ====================
 
 document.addEventListener('DOMContentLoaded', () => {
   renderHomePage();
+  updateLoginButton(); // Set initial button state based on logged in status
   
   document.getElementById('menuToggle').addEventListener('click', () => {
     document.getElementById('navLinks').classList.toggle('show');
   });
   
-  document.getElementById('loginBtn').addEventListener('click', () => {
-    showModal('loginModal');
-  });
+  // Login button is now managed by updateLoginButton function
+  // We don't set onclick here anymore because updateLoginButton handles it
   
   document.getElementById('submitLogin').addEventListener('click', handleLogin);
   
@@ -1193,18 +1200,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
   
+  // If user is already logged in from previous session, show appropriate dashboard
   if (currentUser) {
-    const navLinks = document.getElementById('navLinks');
-    const loginBtn = document.getElementById('loginBtn');
-    
-    if (loginBtn) loginBtn.style.display = 'none';
-    
-    const logoutBtn = document.createElement('button');
-    logoutBtn.className = 'login-btn logout-btn';
-    logoutBtn.innerHTML = '<i class="fas fa-sign-out-alt"></i> Logout';
-    logoutBtn.onclick = logout;
-    navLinks.appendChild(logoutBtn);
-    
     if (currentUser.role === 'admin') {
       renderAdminDashboard();
     } else {
