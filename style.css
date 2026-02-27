@@ -147,29 +147,7 @@ body {
   margin-bottom: 2rem;
   color: var(--accent);
 }
-/* Seat Select Hint */
-.seat-select-hint {
-  text-align: center;
-  margin-top: 10px;
-  color: var(--secondary);
-  font-size: 0.9rem;
-  opacity: 0.7;
-  transition: opacity 0.3s;
-}
 
-.seat-option:hover .seat-select-hint {
-  opacity: 1;
-}
-
-.seat-option {
-  cursor: pointer;
-}
-
-.seat-option.selected {
-  border-color: var(--secondary);
-  background: linear-gradient(135deg, #fff9e6, #ffffff);
-  box-shadow: 0 0 0 3px rgba(198,164,63,0.2);
-}
 /* Search Box */
 .search-box {
   background: rgba(255,255,255,0.95);
@@ -962,7 +940,7 @@ body {
   font-style: italic;
 }
 
-/* Seat Selection Modal Styles */
+/* ========== SEAT SELECTION MODAL STYLES ========== */
 .seat-selection-modal .modal-content {
   max-width: 700px;
 }
@@ -1056,6 +1034,19 @@ body {
   margin-top: 0.5rem;
 }
 
+.seat-select-hint {
+  text-align: center;
+  margin-top: 10px;
+  color: var(--secondary);
+  font-size: 0.9rem;
+  opacity: 0.7;
+  transition: opacity 0.3s;
+}
+
+.seat-option:hover .seat-select-hint {
+  opacity: 1;
+}
+
 .passenger-details-section {
   margin-top: 2rem;
   padding-top: 2rem;
@@ -1070,12 +1061,6 @@ body {
 .passenger-details-section h3 i {
   color: var(--secondary);
   margin-right: 8px;
-}
-
-.proceed-to-payment {
-  margin-top: 2rem;
-  padding: 1rem;
-  font-size: 1.1rem;
 }
 
 .train-route-modal {
@@ -1145,71 +1130,32 @@ body {
   grid-template-columns: 1fr 1fr;
   gap: 1rem;
 }
+/* Add these styles at the end of your existing style.css */
 
-/* Additional Navy & Gold Elements */
-.gold-border {
-  border: 2px solid var(--secondary);
+/* Logout button style (reuses login-btn class) */
+.logout-btn {
+  background: linear-gradient(135deg, #d32f2f, #b71c1c) !important;
+  color: white !important;
 }
 
-.navy-bg {
-  background: var(--primary);
+.logout-btn:hover {
+  background: linear-gradient(135deg, #b71c1c, #d32f2f) !important;
 }
 
-.gold-text {
-  color: var(--secondary);
-}
-
-.gradient-gold {
-  background: linear-gradient(135deg, var(--secondary), var(--accent));
-}
-
-/* Table Styles */
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin: 1rem 0;
-}
-
-th {
-  background: var(--primary);
-  color: var(--accent);
-  padding: 0.8rem;
-  font-weight: 600;
-}
-
-td {
-  padding: 0.8rem;
-  border-bottom: 1px solid #e0e0e0;
-}
-
-tr:hover td {
-  background-color: #f8f9fc;
-}
-
-/* Badge Styles */
-.priority-badge {
-  background: linear-gradient(135deg, var(--secondary), var(--accent));
+/* User badge in nav when logged in */
+.user-nav-badge {
+  background: var(--secondary);
   color: var(--primary);
-  padding: 0.2rem 1rem;
-  border-radius: 30px;
-  font-weight: 700;
-  font-size: 0.8rem;
-  display: inline-block;
-  margin-left: 0.5rem;
-  box-shadow: 0 2px 5px rgba(198,164,63,0.3);
+  padding: 0.3rem 1rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  margin-left: 1rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
 }
 
-/* Loading Spinner */
-.spinner {
-  border: 4px solid rgba(198,164,63,0.1);
-  border-left-color: var(--secondary);
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  animation: spin 1s linear infinite;
-  margin: 2rem auto;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
+.user-nav-badge i {
+  font-size: 1rem;
 }
