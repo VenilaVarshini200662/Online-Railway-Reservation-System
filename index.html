@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RailReserve - Smart Train Booking Platform</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <div class="logo">
+        <i class="fas fa-train"></i>
+        <span>RailReserve <small>Book & Travel</small></span>
+      </div>
+      <div class="nav-links" id="navLinks">
+        <a href="#home" class="active"><i class="fas fa-home"></i> Home</a>
+        <a href="#trains"><i class="fas fa-subway"></i> Trains</a>
+        <a href="#pnr"><i class="fas fa-ticket-alt"></i> PNR Status</a>
+        <a href="#holidays"><i class="fas fa-umbrella-beach"></i> Holidays</a>
+        <a href="#contact"><i class="fas fa-headset"></i> Contact</a>
+        <button class="login-btn" id="loginBtn"><i class="fas fa-user-circle"></i> Login</button>
+      </div>
+      <div class="menu-toggle" id="menuToggle">
+        <i class="fas fa-bars"></i>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main id="main-content">
+    <!-- Home Page will be loaded dynamically -->
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-section">
+        <h4><i class="fas fa-train"></i> RailReserve</h4>
+        <p>Your trusted train booking platform. Book tickets safely and securely with RailReserve.</p>
+        <div class="social-links">
+          <a href="#"><i class="fab fa-facebook"></i></a>
+          <a href="#"><i class="fab fa-twitter"></i></a>
+          <a href="#"><i class="fab fa-instagram"></i></a>
+          <a href="#"><i class="fab fa-youtube"></i></a>
+        </div>
+      </div>
+      <div class="footer-section">
+        <h4>Quick Links</h4>
+        <ul>
+          <li><a href="#trains"><i class="fas fa-chevron-right"></i> Train Schedule</a></li>
+          <li><a href="#pnr"><i class="fas fa-chevron-right"></i> Check PNR</a></li>
+          <li><a href="#cancellation"><i class="fas fa-chevron-right"></i> Cancellation</a></li>
+          <li><a href="#refund"><i class="fas fa-chevron-right"></i> Refund Rules</a></li>
+        </ul>
+      </div>
+      <div class="footer-section">
+        <h4>Contact Us</h4>
+        <ul>
+          <li><i class="fas fa-phone"></i> 1800-RAILRES</li>
+          <li><i class="fas fa-envelope"></i> support@railreserve.com</li>
+          <li><i class="fas fa-map-marker-alt"></i> Mumbai, India</li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2025 RailReserve. All Rights Reserved. | Smart Train Booking Platform</p>
+    </div>
+  </footer>
+
+  <!-- Login Modal -->
+  <div id="loginModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <div class="modal-header">
+        <i class="fas fa-user-circle"></i>
+        <h2>Login to RailReserve</h2>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label><i class="fas fa-envelope"></i> Email</label>
+          <input type="email" id="loginEmail" placeholder="Enter your email" value="venila@example.com">
+        </div>
+        <div class="form-group">
+          <label><i class="fas fa-lock"></i> Password</label>
+          <input type="password" id="loginPassword" placeholder="Enter your password" value="pass123">
+        </div>
+        <div class="form-group">
+          <label><i class="fas fa-user-tag"></i> Login as</label>
+          <select id="loginRole">
+            <option value="user">Passenger</option>
+            <option value="admin">RailReserve Admin</option>
+          </select>
+        </div>
+        <button class="btn-primary" id="submitLogin">Login</button>
+        <p class="register-link">Don't have an account? <a href="#" id="showRegister">Register as Passenger</a></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Register Modal -->
+  <div id="registerModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <div class="modal-header">
+        <i class="fas fa-user-plus"></i>
+        <h2>New User Registration</h2>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label><i class="fas fa-user"></i> Full Name</label>
+          <input type="text" id="regName" placeholder="As per government ID">
+        </div>
+        <div class="form-group">
+          <label><i class="fas fa-envelope"></i> Email</label>
+          <input type="email" id="regEmail" placeholder="Enter valid email">
+        </div>
+        <div class="form-group">
+          <label><i class="fas fa-phone"></i> Mobile</label>
+          <input type="tel" id="regMobile" placeholder="10-digit mobile number">
+        </div>
+        <div class="form-group">
+          <label><i class="fas fa-lock"></i> Password</label>
+          <input type="password" id="regPassword" placeholder="Create password">
+        </div>
+        <button class="btn-primary" id="submitRegister">Register</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Booking Prompt Modal -->
+  <div id="bookingPromptModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <div class="modal-header">
+        <i class="fas fa-ticket-alt"></i>
+        <h2>Booking Required</h2>
+      </div>
+      <div class="modal-body">
+        <p>Please login or register to book tickets on RailReserve</p>
+        <div class="prompt-buttons">
+          <button class="btn-primary" id="promptLogin">Login</button>
+          <button class="btn-secondary" id="promptRegister">New User? Register</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PNR Modal -->
+  <div id="pnrModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <div class="modal-header">
+        <i class="fas fa-search"></i>
+        <h2>PNR Status</h2>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label><i class="fas fa-ticket"></i> Enter 10-digit PNR</label>
+          <input type="text" id="pnrInput" placeholder="e.g., PNR1234567890">
+        </div>
+        <button class="btn-primary" id="checkPnrBtn">Check Status</button>
+        <div id="pnrResult" class="pnr-result"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Payment Modal -->
+  <div id="paymentModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <div class="modal-header">
+        <i class="fas fa-credit-card"></i>
+        <h2>Payment Gateway</h2>
+      </div>
+      <div class="modal-body">
+        <div id="paymentDetails" class="payment-details"></div>
+        <div class="form-group">
+          <label><i class="fas fa-credit-card"></i> Card Number</label>
+          <input type="text" id="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label><i class="fas fa-calendar"></i> Expiry</label>
+            <input type="text" id="cardExpiry" placeholder="MM/YY">
+          </div>
+          <div class="form-group">
+            <label><i class="fas fa-lock"></i> CVV</label>
+            <input type="password" id="cardCvv" placeholder="123" maxlength="3">
+          </div>
+        </div>
+        <div class="form-group">
+          <label><i class="fas fa-user"></i> Cardholder Name</label>
+          <input type="text" id="cardName" placeholder="Name on card">
+        </div>
+        <button class="btn-primary" id="processPayment">Pay Now</button>
+        <p class="payment-note"><i class="fas fa-shield-alt"></i> Your payment is secure. This is a demo payment.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Debug Button (Remove in production) -->
+  <button onclick="debugUsers()" style="position:fixed; bottom:10px; right:10px; z-index:9999; background:gold; padding:8px 15px; border:none; border-radius:5px; cursor:pointer; font-weight:bold;">
+    <i class="fas fa-bug"></i> Debug Login
+  </button>
+
+  <script src="script.js"></script>
+</body>
+</html>
